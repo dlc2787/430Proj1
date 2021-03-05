@@ -1,0 +1,26 @@
+{
+  "name": "430proj1",
+  "version": "1.0.0",
+  "description": "API for 430 Project 1",
+  "main": "./src/server.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "pretest": "eslint ./src --fix",
+    "test": "echo \"Tests Complete\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dlc2787/430Proj1.git"
+  },
+  "author": "Drew Carlson",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/dlc2787/430Proj1/issues"
+  },
+  "homepage": "https://github.com/dlc2787/430Proj1#readme",
+  "devDependencies": {
+    "eslint": "^7.21.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-plugin-import": "^2.22.1"
+  }
+}
