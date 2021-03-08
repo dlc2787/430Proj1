@@ -11,6 +11,7 @@ const urlPair = {
     '/style.css': responses.getStyle,
     '/getFacts': responses.getFacts,
     '/notReal': responses.getNotFound,
+    '/getFactData': responses.getFactData,
     notFound: responses.getNotFound,
   },
   HEAD: {

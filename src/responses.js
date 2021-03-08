@@ -1,4 +1,5 @@
 const fs = require('fs');
+const url = require('url');
 
 const index = fs.readFileSync(`${__dirname}/../client/client.html`);
 const css = fs.readFileSync(`${__dirname}/../client/style.css`);
@@ -42,12 +43,36 @@ const getNotFoundMeta = (request, response) => {
   headResponse(request, response, 404);
 };
 
+// gets facts w/out data
+const retrieveFacts = () => {
+  const results = {};
+  for (let i = 0; i < Object.keys(infoBank).length; i++) {
+    const entry = Object.entries(infoBank)[i];
+    results[entry[0]] = {};
+    results[entry[0]].name = entry[1].name;
+    results[entry[0]].price = entry[1].price;
+    results[entry[0]].GUID = entry[1].GUID;
+  }
+  return results;
+};
+
+const factMessage = (name) => ({ message: infoBank[name].fact });
+
 // get facts
 const getFacts = (request, response) => {
-  formResponse(request, response, 200, { infoBank });
+  formResponse(request, response, 200, retrieveFacts());
 };
 const getFactsMeta = (request, response) => {
   headResponse(request, response, 200);
+};
+
+// this needs to be better and the client should handle error 500s
+const getFactData = (request, response) => {
+  const { query } = url.parse(request.url, true);
+  if (query.name) {
+    return formResponse(request, response, 200, factMessage(query.name));
+  }
+  return formResponse(request, response, 200, { message: 'Cool dummy message! internal server error! kinda' });
 };
 
 // add words to list
@@ -112,6 +137,7 @@ const submitFact = (request, response, body) => {
     infoBank[body.name] = {};
     infoBank[body.name].name = body.name;
     infoBank[body.name].price = 0;
+    infoBank[body.name].GUID = body.name.replace(' ', '');
   }
   infoBank[body.name].fact = body.fact;
 
@@ -141,4 +167,5 @@ module.exports = {
   getFacts,
   getFactsMeta,
   submitFact,
+  getFactData,
 };
