@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Our simple HTTP server</title>
+  <title>The Rabbit Hole</title>
   <link rel="stylesheet" type="text/css" href="/style.css">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
@@ -30,7 +30,7 @@
           break;
       }
 
-      if (parsejson && xhr.status != 204){
+      if (parsejson){
         //elements
         let id = document.createElement('h2');
         let message = document.createElement('p');
@@ -45,8 +45,8 @@
         }
         else {
           let bigstring = "";
-          for (let currentname in response['users']){
-            bigstring += `<span>${response['users'][currentname]['name']} | ${response['users'][currentname]['age']}</span><br>`;
+          for (let currentname in response['infoBank']){
+            bigstring += `<span>${response['infoBank'][currentname]['name']} | ${response['infoBank'][currentname]['fact']}</span><br>`;
           }          
           message.innerHTML = bigstring
         }
@@ -87,11 +87,11 @@
 
     //init
     const init = () => {
-      const nf = document.querySelector("#nameForm");
-      const uf = document.querySelector("#userForm");
+      const iF = document.querySelector("#infoForm");
+      const rF = document.querySelector("#retrieveForm");
       
       //make a get or head request for user list
-      const userRequest = (e) => {
+      const factRequest = (e) => {
         let url = document.querySelector("#urlField").value;
         let method = document.querySelector("#methodSelect").value;
         makeRequest(e, method, url);
@@ -100,14 +100,14 @@
       //make a post request to update user data
       const postUpdate = (e) => {
         let name = document.querySelector("#nameField").value;
-        let age = document.querySelector("#ageField").value;
-        let params = `name=${name}&age=${age}`;
-        makePostRequest(e, '/addUser', params);
+        let fact = document.querySelector("#factField").value;
+        let params = `name=${name}&fact=${fact}`;
+        makePostRequest(e, '/submitFact', params);
       }
 
       //set event listeners
-      nf.addEventListener('submit', postUpdate);
-      uf.addEventListener('submit', userRequest);
+      iF.addEventListener('submit', postUpdate);
+      rF.addEventListener('submit', factRequest);
     }
 
     window.onload = init;
@@ -115,25 +115,28 @@
 </head>
 <body>
   <section id="top">
-    <h3>POST Status Code Tests</h3>
-    <form id="nameForm" action="/addUser" method="post">
-      <label for="name">Name: </label>
+    <h3>The Rabbit Hole</h3>
+
+    <form id="infoForm" action="/submitFact" method="post">
+      <label for="name">Name Your Fact: </label>
       <input id="nameField" type="text" name="name" />
-      <label for="age">Age: </label>
-      <input id="ageField" type="number" name="age" min="0" max="100" step="1"/>
-      <input type="submit" value="Add User" />
+      <label for="fact">Fact: </label>
+      <input id="factField" type="text" name="fact"/>
+      <input type="submit" value="Submit Fact" />
     </form>
-    <form id="userForm" action="/getUsers" method="get">
+
+    <form id="retrieveForm" action="/getFacts" method="get">
       <select id='urlField'>
-        <option value='/getUsers'>/getUsers</option>
+        <option value='/getFacts'>/getFacts</option>
         <option value='/notReal'>/notReal</option>
       </select>
       <select id="methodSelect">
         <option value="get">GET</option>
         <option value="head">HEAD</option>
       </select>
-      <input type="submit" value="Get User" />
+      <input type="submit" value="Get Facts" />
     </form>
+
   </section>
   <section id="content">
   </section>

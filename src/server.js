@@ -9,12 +9,12 @@ const urlPair = {
   GET: {
     '/': responses.getIndex,
     '/style.css': responses.getStyle,
-    '/getUsers': responses.getUsers,
+    '/getFacts': responses.getFacts,
     '/notReal': responses.getNotFound,
     notFound: responses.getNotFound,
   },
   HEAD: {
-    '/getUsers': responses.getUsersMeta,
+    '/getFacts': responses.getFactsMeta,
     '/notReal': responses.getNotFoundMeta,
   },
 };
@@ -28,7 +28,7 @@ const handleGet = (request, response, parsedURL) => {
 };
 
 const handlePost = (request, response, parsedURL) => {
-  if (parsedURL.pathname === '/addUser') {
+  if (parsedURL.pathname === '/submitFact') {
     const body = [];
     // handle errors
     request.on('error', (err) => {
@@ -46,7 +46,7 @@ const handlePost = (request, response, parsedURL) => {
       const bodystring = Buffer.concat(body).toString();
       const queryparams = query.parse(bodystring);
 
-      responses.addUser(request, response, queryparams);
+      responses.submitFact(request, response, queryparams);
     });
   }
 };

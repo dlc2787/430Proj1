@@ -3,7 +3,9 @@ const fs = require('fs');
 const index = fs.readFileSync(`${__dirname}/../client/client.html`);
 const css = fs.readFileSync(`${__dirname}/../client/style.css`);
 
-const users = {};
+const infoBank = {};
+
+const wordBank = {};
 
 // form response to send
 const formResponse = (request, response, code, json) => {
@@ -40,43 +42,95 @@ const getNotFoundMeta = (request, response) => {
   headResponse(request, response, 404);
 };
 
-// get users
-const getUsers = (request, response) => {
-  formResponse(request, response, 200, { users });
+// get facts
+const getFacts = (request, response) => {
+  formResponse(request, response, 200, { infoBank });
 };
-const getUsersMeta = (request, response) => {
+const getFactsMeta = (request, response) => {
   headResponse(request, response, 200);
 };
 
-// add users
-const addUser = (request, response, body) => {
+// add words to list
+const populateWords = (value) => {
+  if (!wordBank[value]) {
+    wordBank[value] = { count: 0 };
+  }
+  wordBank[value].count++;
+};
+
+// remove words
+const decrementWords = (value) => {
+  if (wordBank[value]) {
+    wordBank[value].count--;
+  }
+};
+
+// calcluate the worth of an array of words
+const calculateCoins = (words) => {
+  let total = 0;
+  for (let i = 0; i < words.length; i++) {
+    total += Object.keys(wordBank).length / wordBank[words[i]].count;
+  }
+  return total;
+};
+
+// update the price of all facts to account for new words, lets see if I can do this asynchronously
+const updatePrices = () => {
+  for (let i = 0; i < Object.keys(infoBank).length; i++) {
+    const entry = Object.entries(infoBank)[i];
+    // console.log(entry);
+    entry[1].price = calculateCoins(entry[1].fact.split(' '));
+  }
+};
+
+// add facts
+const submitFact = (request, response, body) => {
   const jsonresponse = {
-    message: 'Name and Age are both required',
+    message: 'Name and Fact are both required',
   };
 
-  if (!body.name || !body.age) {
+  if (!body.name || !body.fact) {
     jsonresponse.id = 'missingParams';
     return formResponse(request, response, 400, jsonresponse);
   }
-  console.log(body);
+  // console.log(body);
 
   let responsecode = 201;
 
-  if (users[body.name]) {
-    responsecode = 204;
-  } else {
-    users[body.name] = {};
-    users[body.name].name = body.name;
-  }
+  // split into words
+  const words = body.fact.split(' ');
 
-  users[body.name].age = body.age;
+  // add the fact
+  if (infoBank[body.name]) {
+    // update an existing fact
+    responsecode = 204;
+    jsonresponse.message = 'Updated Successfully!';
+    const oldStatement = infoBank[body.name].fact.split(' ');
+    oldStatement.forEach(decrementWords);
+  } else {
+    // create a new fact
+    infoBank[body.name] = {};
+    infoBank[body.name].name = body.name;
+    infoBank[body.name].price = 0;
+  }
+  infoBank[body.name].fact = body.fact;
+
+  // populate wordBank
+  words.forEach(populateWords);
+
+  // update prices
+  updatePrices();
+  // console.log(infoBank);
+
+  // calculate coin value of the words
+  jsonresponse.coins = calculateCoins(words);
 
   if (responsecode === 201) {
     jsonresponse.message = 'Created Successfully!';
     return formResponse(request, response, responsecode, jsonresponse);
   }
 
-  return headResponse(request, response, responsecode);
+  return formResponse(request, response, responsecode, jsonresponse);
 };
 
 module.exports = {
@@ -84,7 +138,7 @@ module.exports = {
   getStyle,
   getNotFound,
   getNotFoundMeta,
-  getUsers,
-  getUsersMeta,
-  addUser,
+  getFacts,
+  getFactsMeta,
+  submitFact,
 };
