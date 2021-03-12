@@ -7,8 +7,18 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script type="text/babel"> 
   
+  //coins and buffer for purchasing
   let coins = 0;
+  let priceBuffer = 0;
+
+  //update coins in memory, storage, and page
+  const updateCoins = (dxCoins) => {
+    coins += dxCoins;
+    window.localStorage.setItem('RH-local-user-coins', coins);
+    document.querySelector("#coinDisp").innerHTML = `Coins: ${coins}`;
+  }
     
+  //handle responses from the web
     const handleResponse = (xhr, parsejson) => {
 
       let content = document.querySelector("#content");
@@ -43,9 +53,7 @@
         console.log(response);
         //update coins for submitted facts
         if (response['coins']){
-          coins += parseInt(response['coins']);
-          window.localStorage.setItem('RH-local-user-coins', coins);
-          document.querySelector("#coinDisp").innerHTML = `Coins: ${coins}`;
+          updateCoins(parseInt(response['coins']));
         }
         //display response ids
         if (response['id']){
@@ -54,10 +62,15 @@
         //display response messages
         if (response['message']){
           message.innerHTML = response['message'];
+          //charge user
+          if (priceBuffer != 0){
+            updateCoins(priceBuffer);
+            priceBuffer = 0;
+          }
         }
         //display facts in response
         else {
-          let bigstring = "";
+          let bigstring = "Click on a fact to purchase it:<br>";
           for (let currentname in response){
             bigstring += `<span id="${response[currentname]['GUID']}" value="${response[currentname]['price']}" >${response[currentname]['name']} | ${response[currentname]['price']}</span><br>`;
           }          
@@ -69,17 +82,22 @@
 
         //make fact displays purchasable
         if (!response['message']){
-        for (let currentname in response){
-            let link = document.querySelector(`#${response[currentname]['GUID']}`);
-            link.onclick = () => factGetRequest(response[currentname]['name']);
+          for (let currentname in response){
+            if (coins >= parseInt(response[currentname]['price'])){
+              let link = document.querySelector(`#${response[currentname]['GUID']}`);
+              link.onclick = () => factGetRequest(response[currentname]['name'], parseInt(response[currentname]['price']));
+              link.style.color = "blue";
+              link.style.cursor = "pointer";
+            }
           }   
         }
       }
     }
 
     //request the fact itself from the server
-    const factGetRequest = (name) => {
+    const factGetRequest = (name, price) => {
         const xhr = new XMLHttpRequest();
+        priceBuffer = -1 * price; //set the value of the price, so when we get confirmation of the response we charge the user this amount- no bad charges
         xhr.open('GET', `/getFactData?name=${name}`);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onload = () => handleResponse(xhr, true);
