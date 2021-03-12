@@ -19,3 +19,9 @@ html, body {
   font-size: 2em;
   text-align: center;
 }
+
+#coinDisp {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
+}
