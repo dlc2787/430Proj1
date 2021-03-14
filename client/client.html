@@ -19,28 +19,36 @@
   }
     
   //handle responses from the web
-    const handleResponse = (xhr, parsejson) => {
+    const handleResponse = (xhr, parsejson, submission) => {
 
-      let content = document.querySelector("#content");
+      let output;
+
+      //determine output location
+      if (submission){
+        output = document.querySelector("#messages");
+      }
+      else {
+        output = document.querySelector("#content");
+      }
 
       switch (xhr.status){
         case 200:
-          content.innerHTML = '<b>Success!</b>';
+        output.innerHTML = '<b>Success!</b>';
           break;
         case 201:
-          content.innerHTML = '<b>Entry Added!</b>';
+        output.innerHTML = '<b>Entry Added!</b>';
           break;
         case 204:
-          content.innerHTML = '<b>Entry Updated!</b>';
+        output.innerHTML = '<b>Entry Updated!</b>';
           break;
         case 400:
-          content.innerHTML = '<b>Request failed: Bad Request</b>';
+        output.innerHTML = '<b>Request failed: Bad Request</b>';
           break;
         case 404:
-          content.innerHTML = '<b>Error: Resource not Found</b>';
+        output.innerHTML = '<b>Error: Resource not Found</b>';
           break;
         default:
-          content.innerHTML = '<b>Default response, bad error code from server?</b>';
+        output.innerHTML = '<b>Default response, bad error code from server?</b>';
           break;
       }
 
@@ -77,8 +85,8 @@
           message.innerHTML = bigstring;
         }
         //attach
-        content.appendChild(id);
-        content.appendChild(message);  
+        output.appendChild(id);
+        output.appendChild(message);  
 
         //make fact displays purchasable
         if (!response['message']){
@@ -86,8 +94,6 @@
             if (coins >= parseInt(response[currentname]['price'])){
               let link = document.querySelector(`#${response[currentname]['GUID']}`);
               link.onclick = () => factGetRequest(response[currentname]['name'], parseInt(response[currentname]['price']));
-              link.style.color = "blue";
-              link.style.cursor = "pointer";
             }
           }   
         }
@@ -100,7 +106,7 @@
         priceBuffer = -1 * price; //set the value of the price, so when we get confirmation of the response we charge the user this amount- no bad charges
         xhr.open('GET', `/getFactData?name=${name}`);
         xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onload = () => handleResponse(xhr, true);
+        xhr.onload = () => handleResponse(xhr, true, false);
         xhr.send();
       }
 
@@ -111,11 +117,11 @@
       xhr.setRequestHeader('Accept', 'application/json');
       if (method === 'get'){
         xhr.onload = () => {
-          handleResponse(xhr, true);
+          handleResponse(xhr, true, false);
         }
       } else {
         xhr.onload = () => {
-          handleResponse(xhr, false);
+          handleResponse(xhr, false, false);
         }
       }
 
@@ -130,7 +136,7 @@
       xhr.open('POST', url);
       xhr.setRequestHeader('Accept', 'application/json');
       xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-      xhr.onload = () => handleResponse(xhr, true);
+      xhr.onload = () => handleResponse(xhr, true, true);
       event.preventDefault();
       xhr.send(formdata);
     }
@@ -148,9 +154,8 @@
       
       //make a get or head request for user list
       const factRequest = (e) => {
-        let url = document.querySelector("#urlField").value;
         let method = document.querySelector("#methodSelect").value;
-        makeRequest(e, method, url);
+        makeRequest(e, method, "/getFacts");
       }
 
       //make a post request to update user data
@@ -171,31 +176,35 @@
 </head>
 <body>
   <section id="top">
-    <h3>The Rabbit Hole</h3>
+    <h1>The Rabbit Hole</h1>
 
     <form id="infoForm" action="/submitFact" method="post">
-      <label for="name">Name Your Fact: </label>
-      <input id="nameField" type="text" name="name" />
-      <label for="fact">Fact: </label>
-      <input id="factField" type="text" name="fact"/>
-      <input type="submit" value="Submit Fact" />
+      <h2>Fact Submission</h2>
+      <div>
+        <input id="nameField" type="text" name="name" placeholder="Name Your Fact"/>
+      </div>
+      <div id="fctDiv">
+        <textarea placeholder="Fact" id="factField" type="text" name="fact"></textarea>
+      </div>
+      <div id="btnDiv">
+        <input type="submit" value="Submit Fact" />
+      </div>
+      <div id="messages">
+      </div>
     </form>
 
-    <form id="retrieveForm" action="/getFacts" method="get">
-      <select id='urlField'>
-        <option value='/getFacts'>/getFacts</option>
-        <option value='/notReal'>/notReal</option>
-      </select>
-      <select id="methodSelect">
-        <option value="get">GET</option>
-        <option value="head">HEAD</option>
-      </select>
-      <input type="submit" value="Get Facts" />
-    </form>
-
-    <div id="coinDisp">Coins: 0</div>
-  </section>
-  <section id="content">
-  </section>
+    <section id="factLibrary">
+      <h2>Purchase Facts</h2>
+      <form id="retrieveForm" action="/getFacts" method="get">
+        <select id="methodSelect">
+          <option value="get">GET</option>
+          <option value="head">HEAD</option>
+        </select>
+        <input type="submit" value="Request Facts Catalogue" />
+      </form>
+      <div id="coinDisp">Coins: 0</div>
+      <section id="content">
+      </section>
+    </section>
 </body>
 </html>
