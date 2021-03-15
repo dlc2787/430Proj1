@@ -129,7 +129,6 @@ const submitFact = (request, response, body) => {
   if (infoBank[body.name]) {
     // update an existing fact
     responsecode = 204;
-    jsonresponse.message = 'Updated Successfully!';
     const oldStatement = infoBank[body.name].fact.split(' ');
     oldStatement.forEach(decrementWords);
   } else {
@@ -156,7 +155,7 @@ const submitFact = (request, response, body) => {
     return formResponse(request, response, responsecode, jsonresponse);
   }
 
-  return formResponse(request, response, responsecode, jsonresponse);
+  return headResponse(request, response, responsecode);
 };
 
 module.exports = {

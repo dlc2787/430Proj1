@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
   <title>The Rabbit Hole</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cutive+Mono&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="/style.css">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
@@ -33,22 +35,29 @@
 
       switch (xhr.status){
         case 200:
-        output.innerHTML = '<b>Success!</b>';
+          if (parsejson){
+            output.innerHTML = '';
+          }
+          else {
+            output.innerHTML = '<b>Head Request Recieved!<b>';
+          }
           break;
         case 201:
-        output.innerHTML = '<b>Entry Added!</b>';
+          output.innerHTML = '<b>Entry Added!</b>';
           break;
         case 204:
-        output.innerHTML = '<b>Entry Updated!</b>';
+          output.innerHTML = '<b>Entry Updated!</b></br><p>Your account has been credited 10 Coins.</p>';
+          updateCoins(10);
+          return;
           break;
         case 400:
-        output.innerHTML = '<b>Request failed: Bad Request</b>';
+          output.innerHTML = '<b>Request failed: Bad Request (400)</b>';
           break;
         case 404:
-        output.innerHTML = '<b>Error: Resource not Found</b>';
+          output.innerHTML = '<b>Error: Resource not Found (404)</b>';
           break;
         default:
-        output.innerHTML = '<b>Default response, bad error code from server?</b>';
+          output.innerHTML = '<b>Error: Internal Server Error (500)</b>';
           break;
       }
 
@@ -78,9 +87,9 @@
         }
         //display facts in response
         else {
-          let bigstring = "Click on a fact to purchase it:<br>";
+          let bigstring = "<h3>Click on a fact to purchase it:</h3>";
           for (let currentname in response){
-            bigstring += `<span id="${response[currentname]['GUID']}" value="${response[currentname]['price']}" >${response[currentname]['name']} | ${response[currentname]['price']}</span><br>`;
+            bigstring += `<div class="factoid" id="${response[currentname]['GUID']}" value="${response[currentname]['price']}"><span>Fact: ${response[currentname]['name']}</span><span>Price: ${response[currentname]['price']} Coins</span></div>`;
           }          
           message.innerHTML = bigstring;
         }
@@ -175,8 +184,8 @@
   </script>
 </head>
 <body>
+  <h1>The Rabbit Hole_</h1>
   <section id="top">
-    <h1>The Rabbit Hole</h1>
 
     <form id="infoForm" action="/submitFact" method="post">
       <h2>Fact Submission</h2>
@@ -194,17 +203,22 @@
     </form>
 
     <section id="factLibrary">
-      <h2>Purchase Facts</h2>
-      <form id="retrieveForm" action="/getFacts" method="get">
-        <select id="methodSelect">
-          <option value="get">GET</option>
-          <option value="head">HEAD</option>
-        </select>
-        <input type="submit" value="Request Facts Catalogue" />
-      </form>
-      <div id="coinDisp">Coins: 0</div>
+      <div id="libraryHeader">
+        <h2>Purchase Facts</h2>
+        <div>
+          <form id="retrieveForm" action="/getFacts" method="get">
+            <select id="methodSelect">
+              <option value="get">GET</option>
+              <option value="head">HEAD</option>
+            </select>
+            <input type="submit" value="Request Catalogue" />
+          </form>
+        <span id="coinDisp">Coins: 0</span>
+        </div>
+      </div>
       <section id="content">
       </section>
     </section>
+  </section>
 </body>
 </html>
