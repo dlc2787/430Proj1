@@ -3,6 +3,7 @@ const url = require('url');
 
 const index = fs.readFileSync(`${__dirname}/../client/client.html`);
 const css = fs.readFileSync(`${__dirname}/../client/style.css`);
+const documentation = fs.readFileSync(`${__dirname}/../client/documentation.pdf`);
 
 const infoBank = {};
 
@@ -32,6 +33,13 @@ const getIndex = (request, response) => {
 const getStyle = (request, response) => {
   response.writeHead(200, { 'Content-Type': 'text/css' });
   response.write(css);
+  response.end();
+};
+
+// documentation
+const getDocs = (request, response) => {
+  response.writeHead(200, { 'Content-Type': 'application.pdf' });
+  response.write(documentation);
   response.end();
 };
 
@@ -167,6 +175,7 @@ const submitFact = (request, response, body) => {
 module.exports = {
   getIndex,
   getStyle,
+  getDocs,
   getNotFound,
   getNotFoundMeta,
   getFacts,

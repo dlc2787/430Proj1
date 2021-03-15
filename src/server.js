@@ -10,13 +10,12 @@ const urlPair = {
     '/': responses.getIndex,
     '/style.css': responses.getStyle,
     '/getFacts': responses.getFacts,
-    '/notReal': responses.getNotFound,
     '/getFactData': responses.getFactData,
+    '/documentation': responses.getDocs,
     notFound: responses.getNotFound,
   },
   HEAD: {
     '/getFacts': responses.getFactsMeta,
-    '/notReal': responses.getNotFoundMeta,
   },
 };
 
@@ -53,7 +52,7 @@ const handlePost = (request, response, parsedURL) => {
 };
 
 const onReq = (request, response) => {
-  //console.log(request.url);
+  // console.log(request.url);
   const parsedURL = url.parse(request.url);
   if (request.method === 'POST') {
     handlePost(request, response, parsedURL);
