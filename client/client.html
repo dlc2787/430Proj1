@@ -66,8 +66,7 @@
         let id = document.createElement('h2');
         let message = document.createElement('p');
         let response = JSON.parse(xhr.response);
-        //populate
-        console.log(response);
+        //console.log(response);
         //update coins for submitted facts
         if (response['coins']){
           updateCoins(parseInt(response['coins']));

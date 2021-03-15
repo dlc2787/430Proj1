@@ -94,9 +94,11 @@ const decrementWords = (value) => {
 const calculateCoins = (words) => {
   let total = 0;
   for (let i = 0; i < words.length; i++) {
-    total += Object.keys(wordBank).length / wordBank[words[i]].count;
+    // each word is worth 1/4 of the database's length divided by the frequency the words appears
+    // each word in a fact adds an additional 4 coins of value
+    total += ((Object.keys(wordBank).length / 4) / wordBank[words[i]].count + 4);
   }
-  return total;
+  return Math.round(total);
 };
 
 // update the price of all facts to account for new words, lets see if I can do this asynchronously
@@ -126,7 +128,7 @@ const submitFact = (request, response, body) => {
   const words = factNoPunct.split(' ');
 
   // generate GUID
-  const GUID = body.name.replace(/[.,/#!@$%^&*;:{}+=\-_`~()?'"[\]|<> ]+/g, '').replace(/1|2|3|4|5|6|7|8|9|0/, "num");
+  const GUID = body.name.replace(/[.,/#!@$%^&*;:{}+=\-_`~()?'"[\]|<> ]+/g, '').replace(/1|2|3|4|5|6|7|8|9|0/, 'num');
 
   // add the fact
   if (infoBank[GUID]) {
