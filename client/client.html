@@ -89,7 +89,7 @@
         else {
           let bigstring = "<h3>Click on a fact to purchase it:</h3>";
           for (let currentname in response){
-            bigstring += `<div class="factoid" id="${response[currentname]['GUID']}" value="${response[currentname]['price']}"><span>Fact: ${response[currentname]['name']}</span><span>Price: ${response[currentname]['price']} Coins</span></div>`;
+            bigstring += `<div class="factoid" id="${response[currentname]['GUID']}" value="${response[currentname]['price']}"><span>${response[currentname]['name']}</span><span>Price: ${response[currentname]['price']} Coins</span></div>`;
           }          
           message.innerHTML = bigstring;
         }
@@ -102,7 +102,7 @@
           for (let currentname in response){
             if (coins >= parseInt(response[currentname]['price'])){
               let link = document.querySelector(`#${response[currentname]['GUID']}`);
-              link.onclick = () => factGetRequest(response[currentname]['name'], parseInt(response[currentname]['price']));
+              link.onclick = () => factGetRequest(response[currentname]['GUID'], parseInt(response[currentname]['price']));
             }
           }   
         }
@@ -220,5 +220,6 @@
       </section>
     </section>
   </section>
+  <footer><span>Website 2021 Drew Carlson | </span><a href="">about</a></footer>
 </body>
 </html>

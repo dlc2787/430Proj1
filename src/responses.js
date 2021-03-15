@@ -103,8 +103,7 @@ const calculateCoins = (words) => {
 const updatePrices = () => {
   for (let i = 0; i < Object.keys(infoBank).length; i++) {
     const entry = Object.entries(infoBank)[i];
-    // console.log(entry);
-    entry[1].price = calculateCoins(entry[1].fact.split(' '));
+    entry[1].price = calculateCoins(entry[1].factNoPunct.split(' '));
   }
 };
 
@@ -122,23 +121,28 @@ const submitFact = (request, response, body) => {
 
   let responsecode = 201;
 
-  // split into words
-  const words = body.fact.split(' ');
+  // split into words and format factNoPunct
+  const factNoPunct = body.fact.replace(/[.,/#@!$%^&*;:{}+=\-_`~()?'"[\]|<>]+/g, '');
+  const words = factNoPunct.split(' ');
+
+  // generate GUID
+  const GUID = body.name.replace(/[.,/#!@$%^&*;:{}+=\-_`~()?'"[\]|<> ]+/g, '').replace(/1|2|3|4|5|6|7|8|9|0/, "num");
 
   // add the fact
-  if (infoBank[body.name]) {
+  if (infoBank[GUID]) {
     // update an existing fact
     responsecode = 204;
-    const oldStatement = infoBank[body.name].fact.split(' ');
+    const oldStatement = infoBank[GUID].factNoPunct.split(' ');
     oldStatement.forEach(decrementWords);
   } else {
     // create a new fact
-    infoBank[body.name] = {};
-    infoBank[body.name].name = body.name;
-    infoBank[body.name].price = 0;
-    infoBank[body.name].GUID = body.name.replace(' ', '');
+    infoBank[GUID] = {};
+    infoBank[GUID].name = body.name;
+    infoBank[GUID].price = 0;
+    infoBank[GUID].GUID = GUID;
   }
-  infoBank[body.name].fact = body.fact;
+  infoBank[GUID].factNoPunct = factNoPunct;
+  infoBank[GUID].fact = body.fact;
 
   // populate wordBank
   words.forEach(populateWords);
@@ -151,7 +155,7 @@ const submitFact = (request, response, body) => {
   jsonresponse.coins = calculateCoins(words);
 
   if (responsecode === 201) {
-    jsonresponse.message = 'Created Successfully!';
+    jsonresponse.message = `Your account has been credited ${jsonresponse.coins} coins.`;
     return formResponse(request, response, responsecode, jsonresponse);
   }
 

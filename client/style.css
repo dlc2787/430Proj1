@@ -87,7 +87,7 @@ p {
 }
 
 .factoid {
-  background-color: rgba(87, 195, 238, 0.7);
+  background-color: rgba(87, 195, 238, 0.6);
   cursor: pointer;
   display: flex;
   justify-content: space-between;
@@ -115,6 +115,14 @@ p {
   font-weight: bold;
   margin: 0.2rem;
   margin-left: 0.6rem;
+  background-color: lightgoldenrodyellow;
+}
+
+footer {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  font-size: 1.2em;
 }
 
 @media (min-width: 64rem) {
@@ -124,14 +132,14 @@ p {
   }
 
   #infoForm {
-    height: 50rem;
+    height: 49rem;
     width: 24rem;
   }
 
   #factLibrary{
     min-width: 30rem;
     width: 100rem;
-    min-height: 52rem;
+    min-height: 51rem;
   }
 
   #libraryHeader {
